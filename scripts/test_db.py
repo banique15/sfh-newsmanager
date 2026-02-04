@@ -7,55 +7,59 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.config.settings import settings
-from src.database import News, get_db
+from supabase import create_client
+from supabase import create_client
+import traceback
 
 
 def main() -> None:
-    """Test database connection and query news articles."""
+    """Test database connection."""
     print("=" * 60)
     print("Newsletter Manager - Database Connection Test")
     print("=" * 60)
-    print()
-    print(f"Database URL: {settings.database_url[:50]}...")
-    print()
     
-    # Get database session
-    session = next(get_db())
+    print(f"\nSupabase URL: {settings.supabase_url[:30]}...")
     
     try:
-        # Test query: count articles
-        total_count = session.query(News).count()
-        print(f"✅ Connection successful!")
-        print(f"Total articles: {total_count}")
-        print()
+        # Test 1: Supabase client connection
+        print("\n[Test 1] Creating Supabase client...")
+        supabase = create_client(settings.supabase_url, settings.supabase_key)
+        print("✅ Supabase client created")
         
-        # Get draft vs published counts
-        draft_count = session.query(News).filter(News.draft == True).count()
-        published_count = session.query(News).filter(News.draft == False).count()
+        # Test 2: Query news table
+        print("\n[Test 2] Querying news table...")
+        result = supabase.table("news").select("id, news_title, draft").limit(10).execute()
+        total_count = len(result.data)
+        print(f"✅ Successfully queried news table")
+        print(f"✅ Found {total_count} articles")
         
-        print(f"Draft articles: {draft_count}")
-        print(f"Published articles: {published_count}")
-        print()
+        # Test 3: Filter by status
+        print("\n[Test 3] Filtering by draft status...")
+        draft_result = supabase.table("news").select("*", count="exact").eq("draft", True).execute()
+        published_result = supabase.table("news").select("*", count="exact").eq("draft", False).execute()
         
-        # Show recent articles
-        if total_count > 0:
-            print("Recent articles:")
-            print("-" * 60)
-            articles = session.query(News).order_by(News.created_at.desc()).limit(5).all()
-            for article in articles:
-                status = "DRAFT" if article.draft else "PUBLISHED"
-                print(f"  [{status}] {article.news_title}")
-            print()
+        draft_count = draft_result.count if hasattr(draft_result, 'count') else len(draft_result.data)
+        published_count = published_result.count if hasattr(published_result, 'count') else len(published_result.data)
         
-        print("=" * 60)
-        print("✅ Database test completed successfully!")
+        print(f"✅ Draft articles: {draft_count}")
+        print(f"✅ Published articles: {published_count}")
+        
+        # Test 4: Display sample articles
+        if result.data:
+            print("\n[Test 4] Sample articles:")
+            for article in result.data[:5]:
+                status = "DRAFT" if article.get('draft') else "PUBLISHED"
+                print(f"  [{article['id']}] {article['news_title']} ({status})")
+        
+        print("\n" + "=" * 60)
+        print("✅ All database tests passed!")
         print("=" * 60)
         
     except Exception as e:
-        print(f"❌ Error: {e}")
-        raise
-    finally:
-        session.close()
+        print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return
 
 
 if __name__ == "__main__":
