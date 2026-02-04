@@ -24,17 +24,17 @@
 - [x] Write unit tests
 
 ### Step 1.4: Search & Status Tools (2-3 days)
-- [ ] Implement article_search
-- [ ] Implement article_status (publish/unpublish)
-- [ ] Write unit tests
+- [x] Implement article_search
+- [x] Implement article_status (publish/unpublish)
+- [x] Write unit tests
 
 ## Phase 2: Basic Agent & LLM (Week 3)
 
 ### Step 2.1: LLM Setup (1-2 days)
-- [ ] Choose LLM provider
-- [ ] Set up API credentials
-- [ ] Create LLM wrapper
-- [ ] Test basic prompts
+- [x] Choose LLM provider
+- [x] Set up API credentials
+- [x] Create LLM wrapper
+- [x] Test basic prompts
 
 ### Step 2.2: Intent Detection (2-3 days)
 - [ ] Create intent prompts
