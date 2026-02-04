@@ -1,14 +1,27 @@
 {
-  "id": "article_001",
-  "title": "Summer Concert Series 2026",
-  "slug": "summer-concert-series-2026",
-  "excerpt": "Join us for an unforgettable summer of music as Sing for Hope brings talented artists to communities across the city.",
-  "content": "We're thrilled to announce our Summer Concert Series 2026! This year, we're bringing live music to 15 neighborhoods across New York City.\n\nEach concert features world-class musicians performing in public spaces, making art accessible to everyone. From classical to jazz, folk to contemporary, there's something for every music lover.\n\nAll concerts are free and open to the public. Bring your friends and family!\n\n**Schedule:**\n- June 15: Central Park\n- June 22: Brooklyn Bridge Park\n- June 29: Queens Botanical Garden\n\nVisit our website for the full schedule and artist lineup.",
-  "status": "draft",
-  "hero_image_url": null,
-  "created_at": "2026-02-04T14:30:00Z",
-  "updated_at": "2026-02-04T14:30:00Z",
-  "published_at": null,
-  "author": "Newsletter Manager Bot",
-  "tags": ["concerts", "summer", "events", "music"]
+  "id": 42,
+  "idx": 0,
+  "news_title": "Annual Gala 2026 - Save the Date",
+  "news_excerpt": "Join us for our annual fundraising gala on October 15, 2026, celebrating the arts and community impact.",
+  "newscontent": "<p>We're excited to announce our Annual Gala 2026, taking place on October 15th at the Grand Ballroom in Manhattan.</p>\n\n<p>This year's gala will celebrate 15 years of bringing the arts to communities across New York City and beyond. Join us for an evening of music, art, and inspiration as we honor our donors, artists, and community partners who make our mission possible.</p>\n\n<p>Tickets will be available starting in August. Stay tuned for more details!</p>",
+  "news_content": {
+    "content": "content"
+  },
+  "news_image": null,
+  "news_image_caption": null,
+  "news_url": "annual-gala-2026-save-the-date",
+  "news_author": "Newsletter Manager Bot",
+  "news_date": "2026-02-04 14:30:00.000+00",
+  "created_at": "2026-02-04 14:30:15.123456+00",
+  "news_updated": null,
+  "draft": true,
+  "news_status": "draft",
+  "featured": false,
+  "featured_order": null,
+  "news_categories": [
+    "events",
+    "fundraising"
+  ],
+  "related_program": null,
+  "sun": null
 }

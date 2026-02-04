@@ -1,19 +1,24 @@
 {
-    "id": "article_002",
-    "title": "Gala Night 2025 Recap",
-    "slug": "gala-night-2025-recap",
-    "excerpt": "Our annual gala was a tremendous success, raising over $500,000 for arts education programs.",
-    "content": "Thank you to everyone who joined us for Gala Night 2025! The evening was filled with inspiring performances, heartfelt stories, and incredible generosity.\n\nWith over 400 attendees, we raised more than $500,000 to support arts education in underserved communities. These funds will directly impact thousands of students across the region.\n\n**Highlights:**\n- Opening performance by the Youth Orchestra\n- Keynote speech by renowned artist Maria Chen\n- Silent auction featuring original artwork\n- Recognition of our Community Champions\n\nWe're deeply grateful to our sponsors, donors, volunteers, and everyone who made this evening possible. Together, we're creating a world where the arts are accessible to all.",
-    "status": "published",
-    "hero_image_url": "https://cdn.singforhope.org/images/gala-2025-hero.jpg",
-    "created_at": "2025-11-20T10:00:00Z",
-    "updated_at": "2025-11-21T09:00:00Z",
-    "published_at": "2025-11-21T09:00:00Z",
-    "author": "Newsletter Manager Bot",
-    "tags": [
-        "gala",
-        "fundraising",
-        "events",
-        "community"
-    ]
+    "id": 39,
+    "idx": 0,
+    "news_title": "2024 Sing for Hope Pianos in NYC, New Orleans, Newport News, Paris, & More",
+    "news_excerpt": "Sing for Hope continues to expand the impact and scope of our beloved Pianos program, launching powerful new citywide programs in New York City and cities worldwide.",
+    "newscontent": "<p>In 2024, Sing for Hope continues to increase the impact and scope of our beloved Sing for Hope Pianos, launching powerful new citywide programs across all five boroughs of our home base of New York City, as well as the cities of New Orleans, Newport News, Paris, and more.</p>\n\n<p>The Sing for Hope Pianos, one of the world's largest public art initiatives, places artist-designed pianos in parks and public spaces for anyone and everyone to enjoy. Each Sing for Hope Piano is a unique work of art, created by dedicated artists who believe in the power of \"art for all\" to foster public health and well-being, equity, and joy. The Sing for Hope Pianos transform everyday spaces into vibrant community hubs, inviting people to come together through music. After their outdoor tenure, the pianos find new homes in schools, hospitals, and community centers, where they continue to inspire and uplift.</p>",
+    "news_content": {
+        "content": "content"
+    },
+    "news_image": "https://app.singforhope.org/storage/v1/object/public/uploads/public/news/JJ%20Gonzalez%20Acosta%20-%20Little%20Island%20In%20Manhattan%20SFH%20Bach.jpeg",
+    "news_image_caption": "Sing for Hope Piano 'Bach in NYC' by JJ Gonzalez Acosta",
+    "news_url": "2024-sing-for-hope-pianos-in-NYC,-new-orleans,-newport-news,-Paris,-and-more",
+    "news_author": null,
+    "news_date": "2024-02-22 22:04:28.291+00",
+    "created_at": "2024-02-22 22:04:28.675312+00",
+    "news_updated": null,
+    "draft": false,
+    "news_status": null,
+    "featured": false,
+    "featured_order": 11,
+    "news_categories": null,
+    "related_program": null,
+    "sun": null
 }

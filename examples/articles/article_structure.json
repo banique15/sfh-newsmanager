@@ -1,42 +1,161 @@
 {
-    "article": {
-        "id": "string (unique identifier)",
-        "title": "string (headline, required)",
-        "slug": "string (URL-friendly version of title)",
-        "excerpt": "string (short summary, ~1-2 sentences)",
-        "content": "string (full article body, markdown supported)",
-        "status": "string (draft|published)",
-        "hero_image_url": "string|null (URL to main image)",
-        "created_at": "ISO 8601 timestamp",
-        "updated_at": "ISO 8601 timestamp",
-        "published_at": "ISO 8601 timestamp|null",
-        "author": "string (author name or 'Newsletter Manager Bot')",
-        "tags": "array of strings (categories/topics)"
+    "schema_version": "1.0",
+    "description": "Complete article data model matching actual database structure",
+    "fields": {
+        "id": {
+            "type": "integer",
+            "description": "Unique article identifier (auto-generated)",
+            "required": false,
+            "example": 39
+        },
+        "idx": {
+            "type": "integer",
+            "description": "Index for ordering",
+            "required": false,
+            "example": 0
+        },
+        "news_title": {
+            "type": "string",
+            "description": "Article headline/title",
+            "required": true,
+            "max_length": 200,
+            "example": "2024 Sing for Hope Pianos in NYC, New Orleans, Newport News, Paris, & More"
+        },
+        "news_excerpt": {
+            "type": "string",
+            "description": "Short summary (1-2 sentences)",
+            "required": false,
+            "auto_generated": "from first sentences if not provided",
+            "example": "Sing for Hope continues to expand our beloved Pianos program to cities worldwide."
+        },
+        "newscontent": {
+            "type": "string",
+            "description": "Main article body (HTML or plain text)",
+            "required": true,
+            "format": "HTML with <p> tags",
+            "example": "<p>In 2024, Sing for Hope continues to increase the impact...</p>"
+        },
+        "news_content": {
+            "type": "object",
+            "description": "Structured content object",
+            "required": false,
+            "example": {
+                "content": "content"
+            }
+        },
+        "news_image": {
+            "type": "string",
+            "description": "URL to hero image",
+            "required": false,
+            "format": "https://...",
+            "example": "https://app.singforhope.org/storage/v1/object/public/uploads/public/news/..."
+        },
+        "news_image_caption": {
+            "type": "string",
+            "description": "Caption/alt text for hero image",
+            "required": false,
+            "example": "Sing for Hope Piano 'Bach in NYC' by JJ Gonzalez Acosta"
+        },
+        "news_url": {
+            "type": "string",
+            "description": "URL slug for the article",
+            "required": false,
+            "auto_generated": "from title if not provided",
+            "format": "kebab-case",
+            "example": "2024-sing-for-hope-pianos-in-NYC,-new-orleans,-newport-news,-Paris,-and-more"
+        },
+        "news_author": {
+            "type": "string",
+            "description": "Author name",
+            "required": false,
+            "default": "Newsletter Manager Bot",
+            "example": null
+        },
+        "news_date": {
+            "type": "timestamp",
+            "description": "Original creation date",
+            "required": false,
+            "auto_generated": "on creation",
+            "example": "2024-02-22 22:04:28.291+00"
+        },
+        "created_at": {
+            "type": "timestamp",
+            "description": "Database creation timestamp",
+            "required": false,
+            "auto_generated": true,
+            "example": "2024-02-22 22:04:28.675312+00"
+        },
+        "news_updated": {
+            "type": "timestamp",
+            "description": "Last update timestamp",
+            "required": false,
+            "auto_generated": "on update",
+            "example": null
+        },
+        "draft": {
+            "type": "boolean",
+            "description": "Draft status (true=draft, false=published)",
+            "required": true,
+            "default": true,
+            "example": false
+        },
+        "news_status": {
+            "type": "string",
+            "description": "Publication status",
+            "required": false,
+            "allowed_values": [
+                "draft",
+                "published"
+            ],
+            "example": null
+        },
+        "featured": {
+            "type": "boolean",
+            "description": "Whether article is featured",
+            "required": false,
+            "default": false,
+            "example": false
+        },
+        "featured_order": {
+            "type": "integer",
+            "description": "Order in featured list",
+            "required": false,
+            "example": 11
+        },
+        "news_categories": {
+            "type": "array",
+            "description": "Article categories/tags",
+            "required": false,
+            "example": null
+        },
+        "related_program": {
+            "type": "string",
+            "description": "Related Sing for Hope program",
+            "required": false,
+            "example": null
+        },
+        "tiny": {
+            "type": "string",
+            "description": "Rich HTML content with styling",
+            "required": false,
+            "format": "Full HTML with Tailwind classes",
+            "example": "<!-- Existing Page Content -->\n<div class=\"my-8 px-4 w-full\">..."
+        },
+        "sun": {
+            "type": "any",
+            "description": "Additional metadata field",
+            "required": false,
+            "example": null
+        }
     },
-    "required_fields": [
-        "title",
-        "content",
-        "status"
-    ],
-    "optional_fields": [
-        "excerpt",
-        "hero_image_url",
-        "tags"
-    ],
-    "auto_generated": [
-        "id",
-        "slug",
-        "created_at",
-        "updated_at"
-    ],
-    "status_values": {
-        "draft": "Article is saved but not visible on website",
-        "published": "Article is live and visible on website"
-    },
-    "notes": [
-        "If excerpt is not provided, generate from first 1-2 sentences of content",
-        "Slug is auto-generated from title if not provided",
-        "published_at is set when status changes from draft to published",
-        "hero_image_url can link to images stored in media system"
+    "usage_notes": [
+        "draft=true means article is NOT visible on website",
+        "draft=false means article IS published and visible",
+        "news_url slug is auto-generated from title if not provided",
+        "news_excerpt is auto-generated from first 1-2 sentences if not provided",
+        "created_at and news_date are set automatically on creation",
+        "news_updated is set automatically on each update",
+        "newscontent is the primary content field (HTML formatted)",
+        "news_image should be permanent, publicly accessible URL"
     ]
 }
