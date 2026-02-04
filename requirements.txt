@@ -1,0 +1,41 @@
+# Core Framework
+crewai==0.86.0
+crewai-tools==0.12.1
+langchain==0.3.13
+langchain-openai==0.2.14
+langchain-anthropic==0.3.3
+langchain-google-genai==2.0.8
+
+# API Framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+
+# Database & Storage
+supabase==2.11.0
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+
+# Channel Integrations
+slack-bolt==1.21.2
+python-dotenv==1.0.1
+
+# AI & Content
+openai==1.59.7
+anthropic==0.42.0
+google-generativeai==0.8.3
+pillow==11.0.0
+
+# Utilities
+pydantic==2.10.4
+pydantic-settings==2.7.0
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1
+redis==5.2.1
+
+# Development Tools
+black==24.10.0
+ruff==0.8.5
+mypy==1.14.1
+pre-commit==4.0.1
