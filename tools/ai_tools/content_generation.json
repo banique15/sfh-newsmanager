@@ -1,0 +1,89 @@
+{
+    "tool_name": "content_generation",
+    "version": "1.0.0",
+    "description": "Generate article headlines, body content, and excerpts using AI",
+    "category": "ai",
+    "blueprint_tasks": [
+        "3.1",
+        "3.2"
+    ],
+    "required_params": [
+        {
+            "name": "topic",
+            "type": "string",
+            "description": "What the article should be about"
+        }
+    ],
+    "optional_params": [
+        {
+            "name": "tone",
+            "type": "string",
+            "description": "Tone/style of writing",
+            "allowed_values": [
+                "celebratory",
+                "inspiring",
+                "informative",
+                "urgent",
+                "warm",
+                "professional"
+            ],
+            "default": "inspiring"
+        },
+        {
+            "name": "length",
+            "type": "string",
+            "description": "Article length",
+            "allowed_values": [
+                "short",
+                "medium",
+                "long"
+            ],
+            "default": "medium"
+        },
+        {
+            "name": "specific_details",
+            "type": "array",
+            "description": "Specific facts, dates, names, or numbers to include"
+        },
+        {
+            "name": "organization_context",
+            "type": "string",
+            "description": "Organization info (defaults to Sing for Hope mission)",
+            "default": "Sing for Hope - nonprofit bringing the arts to communities"
+        },
+        {
+            "name": "target_audience",
+            "type": "string",
+            "description": "Who the article is for",
+            "default": "supporters, donors, community members"
+        }
+    ],
+    "dependencies": [],
+    "applicable_channels": [
+        "slack",
+        "email",
+        "portal"
+    ],
+    "response_format": {
+        "title": "generated headline (5-10 words)",
+        "content": "generated article body (markdown formatted, 2-5 paragraphs based on length)",
+        "excerpt": "auto-generated summary (1-2 sentences from opening)"
+    },
+    "error_codes": {
+        "GENERATION_FAILED": "I couldn't generate the content. Please try with a different topic or more details.",
+        "TOPIC_TOO_VAGUE": "What should the article be about? I need a clearer topic.",
+        "RATE_LIMITED": "Content generation is temporarily unavailable. Please try again in a moment.",
+        "INAPPROPRIATE_CONTENT": "I can't generate content about that topic. Please try something related to our news and programs."
+    },
+    "usage_notes": [
+        "Always generate title, content, and excerpt together for consistency",
+        "Use Sing for Hope's mission and values in content",
+        "Excerpt should be compelling and encourage reading",
+        "Content should be markdown formatted with proper paragraphs",
+        "Include call-to-action when appropriate (learn more, get involved, etc.)",
+        "Headline should be specific and engaging, not generic",
+        "Respect word counts: short=150-250 words, medium=300-500 words, long=600-800 words",
+        "Incorporate user-provided specific details exactly as given"
+    ],
+    "prompt_template": "../../examples/prompts/article_generation.md"
+}

@@ -1,0 +1,106 @@
+{
+    "tool_name": "image_generation",
+    "version": "1.0.0",
+    "description": "Generate hero images and visual assets for articles using AI",
+    "category": "ai",
+    "blueprint_tasks": [
+        "3.1",
+        "3.8",
+        "3.9"
+    ],
+    "required_params": [
+        {
+            "name": "description",
+            "type": "string",
+            "description": "What the image should show"
+        }
+    ],
+    "optional_params": [
+        {
+            "name": "style",
+            "type": "string",
+            "description": "Visual style",
+            "allowed_values": [
+                "vibrant",
+                "elegant",
+                "minimalist",
+                "photorealistic",
+                "illustrative",
+                "artistic"
+            ],
+            "default": "vibrant"
+        },
+        {
+            "name": "aspect_ratio",
+            "type": "string",
+            "description": "Image dimensions",
+            "allowed_values": [
+                "16:9",
+                "4:3",
+                "1:1",
+                "3:2"
+            ],
+            "default": "16:9"
+        },
+        {
+            "name": "elements",
+            "type": "array",
+            "description": "Specific elements to include (e.g., 'musical instruments', 'people', 'cityscape')"
+        },
+        {
+            "name": "mood",
+            "type": "string",
+            "description": "Emotional tone of image",
+            "allowed_values": [
+                "joyful",
+                "inspiring",
+                "energetic",
+                "calm",
+                "celebratory",
+                "professional"
+            ],
+            "default": "inspiring"
+        },
+        {
+            "name": "organization_branding",
+            "type": "boolean",
+            "description": "Include Sing for Hope visual themes (arts, community, inclusivity)",
+            "default": true
+        }
+    ],
+    "dependencies": [
+        "image_storage"
+    ],
+    "applicable_channels": [
+        "slack",
+        "email",
+        "portal"
+    ],
+    "response_format": {
+        "image_data": "base64 encoded image or temporary URL",
+        "description_used": "final prompt sent to generation service",
+        "metadata": "width, height, format"
+    },
+    "error_codes": {
+        "GENERATION_FAILED": "I couldn't generate the image. Want to try with a different description?",
+        "DESCRIPTION_TOO_VAGUE": "What should the image show? I need a clearer description.",
+        "INAPPROPRIATE_CONTENT": "I can't generate that image. Please try a different description.",
+        "RATE_LIMITED": "Image generation is temporarily unavailable. Please try again later.",
+        "QUOTA_EXCEEDED": "Image generation quota reached. Please try again tomorrow."
+    },
+    "usage_notes": [
+        "Default to 16:9 ratio for hero images (standard web format)",
+        "Always incorporate Sing for Hope themes unless explicitly asked otherwise",
+        "Generate high resolution (at least 1200px wide) for hero images",
+        "Description should be detailed but concise (2-3 sentences)",
+        "Avoid text in generated images (hard to read, translation issues)",
+        "Use warm, inclusive imagery aligned with nonprofit mission",
+        "Return raw image data for immediate preview",
+        "Image must be uploaded via image_storage tool to get permanent URL"
+    ],
+    "output_formats": [
+        "PNG",
+        "JPEG"
+    ],
+    "max_retries": 2
+}

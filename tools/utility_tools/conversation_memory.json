@@ -1,0 +1,109 @@
+{
+    "tool_name": "conversation_memory",
+    "version": "1.0.0",
+    "description": "Store and retrieve conversation context, article references, and interaction history",
+    "category": "utility",
+    "blueprint_tasks": [
+        "all"
+    ],
+    "required_params": [
+        {
+            "name": "action",
+            "type": "string",
+            "description": "Memory operation to perform",
+            "allowed_values": [
+                "store",
+                "retrieve",
+                "update",
+                "clear"
+            ]
+        }
+    ],
+    "optional_params": [
+        {
+            "name": "user_id",
+            "type": "string",
+            "description": "User identifier (for per-user memory)"
+        },
+        {
+            "name": "channel_id",
+            "type": "string",
+            "description": "Channel/thread identifier"
+        },
+        {
+            "name": "memory_type",
+            "type": "string",
+            "description": "What to store/retrieve",
+            "allowed_values": [
+                "article_reference",
+                "last_operation",
+                "user_preference",
+                "conversation_turn"
+            ]
+        },
+        {
+            "name": "data",
+            "type": "object",
+            "description": "Data to store"
+        },
+        {
+            "name": "ttl_minutes",
+            "type": "integer",
+            "description": "How long to keep this memory (time-to-live)",
+            "default": 1440
+        }
+    ],
+    "dependencies": [],
+    "applicable_channels": [
+        "slack",
+        "email",
+        "portal"
+    ],
+    "response_format": {
+        "success": "boolean",
+        "data": "retrieved data (for retrieve action)",
+        "memory_id": "unique ID of stored memory"
+    },
+    "stored_data_types": {
+        "article_reference": {
+            "article_id": "string",
+            "article_title": "string",
+            "timestamp": "when referenced",
+            "operation": "what was done (created, updated, etc.)"
+        },
+        "last_operation": {
+            "operation_type": "create|update|delete|publish|etc.",
+            "target_article_id": "string",
+            "timestamp": "when performed",
+            "success": "boolean"
+        },
+        "conversation_turn": {
+            "user_message": "string",
+            "bot_response": "string",
+            "intent": "detected intent",
+            "timestamp": "when exchanged"
+        }
+    },
+    "error_codes": {
+        "STORAGE_FAILED": "Couldn't save context. Continuing anyway.",
+        "RETRIEVAL_FAILED": "Couldn't retrieve context."
+    },
+    "usage_notes": [
+        "Store article references after every create/update/publish operation",
+        "Track last 5-10 conversation turns for context resolution",
+        "Default TTL is 24 hours (1440 minutes)",
+        "Shorter TTL for temporary context (e.g., confirmation pending)",
+        "Longer TTL for important references users might return to",
+        "Clear stale memory after successful operations",
+        "Support both channel-level and user-level memory",
+        "Slack threads should have separate memory scope",
+        "Cross-channel memory requires user_id matching",
+        "Don't store sensitive user data (only article IDs and metadata)"
+    ],
+    "retention_policy": {
+        "article_references": "7 days",
+        "conversation_turns": "1 day",
+        "pending_confirmations": "1 hour",
+        "user_preferences": "30 days"
+    }
+}

@@ -1,0 +1,102 @@
+{
+    "tool_name": "error_handler",
+    "version": "1.0.0",
+    "description": "Format error messages in plain, user-friendly language with actionable next steps",
+    "category": "utility",
+    "blueprint_tasks": [
+        "all"
+    ],
+    "required_params": [
+        {
+            "name": "error_type",
+            "type": "string",
+            "description": "Type of error that occurred"
+        }
+    ],
+    "optional_params": [
+        {
+            "name": "error_details",
+            "type": "object",
+            "description": "Technical details about the error"
+        },
+        {
+            "name": "context",
+            "type": "object",
+            "description": "What the user was trying to do"
+        },
+        {
+            "name": "article_title",
+            "type": "string",
+            "description": "Article involved (if applicable)"
+        }
+    ],
+    "dependencies": [],
+    "applicable_channels": [
+        "slack",
+        "email",
+        "portal"
+    ],
+    "response_format": {
+        "user_message": "plain language error message",
+        "suggested_actions": "array of what user can do next",
+        "severity": "low|medium|high"
+    },
+    "error_message_principles": [
+        "Never show stack traces or technical jargon",
+        "Explain what went wrong in simple terms",
+        "Say what succeeded (if partial failure)",
+        "Provide specific next steps",
+        "Don't blame the user",
+        "Offer help or alternative paths"
+    ],
+    "common_error_templates": {
+        "database_error": "Something went wrong [saving/updating/deleting] the article. Please try again, or let me know if you need help.",
+        "not_found": "I couldn't find that article. It may have been deleted or you might mean a different one.",
+        "duplicate": "An article with a similar title already exists. Would you like to create it with a different title, or update the existing one?",
+        "permission_denied": "You don't have permission to [action] this article. Please contact your administrator.",
+        "rate_limited": "We've hit a rate limit. Please wait a moment and try again.",
+        "validation_failed": "I need more information to [action]. [What's missing]?",
+        "service_unavailable": "[Service name] isn't responding right now. Please try again in a few minutes.",
+        "partial_failure": "[What succeeded], but [what failed]. [What they have now] [What they can do next]",
+        "quota_exceeded": "[Resource] quota reached. [Contact support / try again tomorrow]."
+    },
+    "usage_notes": [
+        "Always provide at least one suggested action",
+        "For partial failures, clearly state what worked and what didn't",
+        "Include article title/link in message when applicable",
+        "Severity=high for data loss risks or service outages",
+        "Severity=medium for failed operations (no data lost)",
+        "Severity=low for validation errors or user mistakes",
+        "Log technical details for debugging but don't show to user",
+        "Suggest retry for transient errors (network, timeouts)",
+        "Suggest clarification for validation errors",
+        "Suggest alternative approach when feature unavailable"
+    ],
+    "suggested_actions_by_error": {
+        "not_found": [
+            "Try searching for it",
+            "Check the title spelling",
+            "List all articles to find it"
+        ],
+        "validation": [
+            "Provide the missing information",
+            "Try rephrasing your request"
+        ],
+        "duplicate": [
+            "Create with different title",
+            "Update the existing article instead"
+        ],
+        "permission": [
+            "Contact your administrator",
+            "Try a different operation"
+        ],
+        "service_unavailable": [
+            "Try again in a few minutes",
+            "Let me know if it persists"
+        ],
+        "partial_failure": [
+            "Try the failed part again",
+            "Use what succeeded and continue"
+        ]
+    }
+}

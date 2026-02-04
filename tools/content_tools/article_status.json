@@ -1,0 +1,58 @@
+{
+    "tool_name": "article_status",
+    "version": "1.0.0",
+    "description": "Change article publication status between draft and published",
+    "category": "content",
+    "blueprint_tasks": [
+        "3.6",
+        "3.7"
+    ],
+    "required_params": [
+        {
+            "name": "operation",
+            "type": "string",
+            "description": "Status operation to perform",
+            "allowed_values": [
+                "publish",
+                "unpublish"
+            ]
+        },
+        {
+            "name": "article_id",
+            "type": "string",
+            "description": "Unique article identifier"
+        }
+    ],
+    "optional_params": [],
+    "dependencies": [
+        "article_crud"
+    ],
+    "applicable_channels": [
+        "slack",
+        "email",
+        "portal"
+    ],
+    "response_format": {
+        "article_id": "ID of affected article",
+        "title": "Article title",
+        "new_status": "draft or published",
+        "published_at": "timestamp (for publish operation)",
+        "public_url": "website URL (for publish operation)"
+    },
+    "error_codes": {
+        "ARTICLE_NOT_FOUND": "I couldn't find that article. It may have been deleted.",
+        "ALREADY_PUBLISHED": "That article is already live. Would you like to unpublish it or make changes?",
+        "ALREADY_DRAFT": "That article is already a draft (not live). Did you mean to delete it or publish it?",
+        "PUBLISH_FAILED": "Something went wrong publishing. The article is still a draft. Please try again.",
+        "UNPUBLISH_FAILED": "Something went wrong. The article is still live. Please try again.",
+        "DATABASE_ERROR": "Something went wrong. Please try again or let me know if you need help."
+    },
+    "usage_notes": [
+        "Publish operation sets status='published' and published_at=now",
+        "Unpublish operation sets status='draft' but preserves published_at for record keeping",
+        "Published articles appear on public website immediately",
+        "Unpublished articles are removed from public website but kept in database",
+        "Always return public URL after successful publish",
+        "Check article exists before attempting status change"
+    ]
+}

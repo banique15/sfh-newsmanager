@@ -1,0 +1,80 @@
+{
+    "tool_name": "email_handler",
+    "version": "1.0.0",
+    "description": "Email parsing and sending for email-based article management",
+    "category": "channel",
+    "blueprint_tasks": [
+        "all"
+    ],
+    "required_params": [
+        {
+            "name": "action",
+            "type": "string",
+            "description": "Action to perform",
+            "allowed_values": [
+                "send_email",
+                "parse_email"
+            ]
+        }
+    ],
+    "optional_params": [
+        {
+            "name": "to",
+            "type": "string",
+            "description": "Recipient email address"
+        },
+        {
+            "name": "subject",
+            "type": "string",
+            "description": "Email subject line"
+        },
+        {
+            "name": "body",
+            "type": "string",
+            "description": "Email body (HTML supported)"
+        },
+        {
+            "name": "reply_to_message_id",
+            "type": "string",
+            "description": "Message ID to reply to (preserves thread)"
+        },
+        {
+            "name": "raw_email",
+            "type": "object",
+            "description": "Raw incoming email to parse"
+        },
+        {
+            "name": "include_links",
+            "type": "array",
+            "description": "Action links to include: [{text: 'Yes', url: 'confirm_url'}, {text: 'Cancel', url: 'cancel_url'}]"
+        }
+    ],
+    "dependencies": [],
+    "applicable_channels": [
+        "email"
+    ],
+    "response_format": {
+        "message_id": "sent email message ID",
+        "parsed_intent": "extracted user intent (for parse_email)",
+        "parsed_entities": "extracted entities (for parse_email)",
+        "sender": "sender email address",
+        "in_reply_to": "thread context if reply"
+    },
+    "error_codes": {
+        "SEND_FAILED": "Email didn't send. Please try again.",
+        "INVALID_EMAIL": "Invalid email address.",
+        "PARSE_ERROR": "Couldn't parse the email. Please send a clearer request.",
+        "RATE_LIMITED": "Too many emails. Please wait."
+    },
+    "usage_notes": [
+        "Support HTML formatting for rich emails",
+        "Preserve email threads using reply_to_message_id",
+        "Parse both plain text and HTML email bodies",
+        "Extract intent from email subject and body",
+        "Handle attachments (for future image upload support)",
+        "Confirmation emails should include Yes/Cancel links",
+        "Include article links when confirming creation/updates",
+        "Use clear subject lines: 'Article Created: [Title]', 'Confirmation Needed: Publish [Title]'",
+        "Strip email signatures and quoted text when parsing intent"
+    ]
+}

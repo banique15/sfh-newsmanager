@@ -1,0 +1,104 @@
+{
+    "tool_name": "yes_no_prompt",
+    "version": "1.0.0",
+    "description": "Generate confirmation prompts with Yes/Cancel options adapted to the channel",
+    "category": "confirmation",
+    "blueprint_tasks": [
+        "3.1",
+        "3.2",
+        "3.4",
+        "3.5",
+        "3.6",
+        "3.7",
+        "3.9",
+        "3.11",
+        "3.12"
+    ],
+    "required_params": [
+        {
+            "name": "message",
+            "type": "string",
+            "description": "Confirmation message to display"
+        },
+        {
+            "name": "channel",
+            "type": "string",
+            "description": "Which channel this is for",
+            "allowed_values": [
+                "slack",
+                "email",
+                "portal"
+            ]
+        }
+    ],
+    "optional_params": [
+        {
+            "name": "warning_level",
+            "type": "string",
+            "description": "Visual emphasis for destructive actions",
+            "allowed_values": [
+                "normal",
+                "warning",
+                "danger"
+            ],
+            "default": "normal"
+        },
+        {
+            "name": "confirm_label",
+            "type": "string",
+            "description": "Custom label for confirm button",
+            "default": "Yes"
+        },
+        {
+            "name": "cancel_label",
+            "type": "string",
+            "description": "Custom label for cancel button",
+            "default": "Cancel"
+        },
+        {
+            "name": "additional_context",
+            "type": "string",
+            "description": "Extra information to show (e.g., preview, current status)"
+        }
+    ],
+    "dependencies": [
+        "slack_bot",
+        "email_handler"
+    ],
+    "applicable_channels": [
+        "slack",
+        "email",
+        "portal"
+    ],
+    "response_format": {
+        "formatted_message": "channel-specific formatted message",
+        "interaction_id": "unique ID to track user's response"
+    },
+    "channel_formats": {
+        "slack": "Block Kit with action buttons",
+        "email": "HTML with Yes/Cancel links",
+        "portal": "Form with submit/cancel buttons"
+    },
+    "error_codes": {
+        "SEND_FAILED": "Couldn't send confirmation. Please try again."
+    },
+    "usage_notes": [
+        "Slack: Use Block Kit buttons for interactive confirmation",
+        "Email: Use mailto links or web links to confirmation endpoints",
+        "Portal: Use standard form buttons",
+        "Destructive actions (delete, unpublish) should use warning_level='danger'",
+        "Publish/update actions should use warning_level='warning'",
+        "Create/generate actions can use warning_level='normal'",
+        "Message should clearly state what will happen",
+        "Include article title explicitly in message (not just 'it')",
+        "Show relevant context: current status, preview, etc.",
+        "Track interaction_id to match responses to original requests"
+    ],
+    "examples": {
+        "create": "I'll create a new article titled '[TITLE]' as a draft. Is this correct?",
+        "update": "I'll update '[ARTICLE_TITLE]' so the [field] is '[new value]'. Is this correct?",
+        "delete": "⚠️ I'll permanently delete '[ARTICLE_TITLE]'. This can't be undone. Are you sure?",
+        "publish": "I'll publish '[ARTICLE_TITLE]' and make it live on the website. Is this correct?",
+        "unpublish": "I'll unpublish '[ARTICLE_TITLE]' and remove it from the website. Is this correct?"
+    }
+}

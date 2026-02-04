@@ -1,0 +1,128 @@
+{
+    "tool_name": "intent_detection",
+    "version": "1.0.0",
+    "description": "Parse user messages to understand intent, extract entities, and detect ambiguity",
+    "category": "ai",
+    "blueprint_tasks": [
+        "all"
+    ],
+    "required_params": [
+        {
+            "name": "user_message",
+            "type": "string",
+            "description": "Raw user input to parse"
+        }
+    ],
+    "optional_params": [
+        {
+            "name": "conversation_context",
+            "type": "array",
+            "description": "Recent conversation turns for context"
+        },
+        {
+            "name": "channel",
+            "type": "string",
+            "description": "Communication channel (affects parsing)",
+            "allowed_values": [
+                "slack",
+                "email",
+                "portal"
+            ]
+        }
+    ],
+    "dependencies": [
+        "conversation_memory"
+    ],
+    "applicable_channels": [
+        "slack",
+        "email",
+        "portal"
+    ],
+    "response_format": {
+        "primary_intent": "create|update|delete|publish|unpublish|list|generate_image|help|unclear",
+        "entities": {
+            "article_reference": "title, ID, or contextual reference",
+            "topic": "what article is about",
+            "field_to_update": "title|content|excerpt|hero_image",
+            "new_value": "replacement content",
+            "status_filter": "draft|published|all",
+            "image_description": "what image should show"
+        },
+        "confidence": "high|medium|low",
+        "ambiguity_flags": [
+            "missing_topic",
+            "unclear_article",
+            "multiple_possible_matches",
+            "vague_request"
+        ],
+        "suggested_clarification": "question to ask user if confidence is low"
+    },
+    "error_codes": {
+        "PARSE_ERROR": "I didn't understand that. Could you rephrase?",
+        "EMPTY_INPUT": "What would you like me to do?"
+    },
+    "usage_notes": [
+        "Detect scope violations (events, pages, forms) early",
+        "Extract specific details: dates, names, numbers, locations",
+        "Identify pronouns ('it', 'that one') for context resolution",
+        "Flag when topic is missing for create requests",
+        "Flag when article reference is missing for update/delete/publish",
+        "Detect bulk operation requests ('all drafts', 'everything')",
+        "Recognize typo fix requests ('change X to Y')",
+        "Identify scheduling requests ('publish on Friday')",
+        "Return low confidence when request is vague or ambiguous",
+        "Suggest specific clarifying question when confidence < medium"
+    ],
+    "intent_patterns": {
+        "create": [
+            "create",
+            "write",
+            "make",
+            "new article",
+            "draft"
+        ],
+        "update": [
+            "update",
+            "change",
+            "edit",
+            "modify",
+            "fix",
+            "set"
+        ],
+        "delete": [
+            "delete",
+            "remove",
+            "get rid of"
+        ],
+        "publish": [
+            "publish",
+            "go live",
+            "make live",
+            "release"
+        ],
+        "unpublish": [
+            "unpublish",
+            "take down",
+            "make draft"
+        ],
+        "list": [
+            "show",
+            "list",
+            "what",
+            "display",
+            "see"
+        ],
+        "generate_image": [
+            "generate image",
+            "create image",
+            "make image",
+            "add image"
+        ],
+        "help": [
+            "help",
+            "what can you do",
+            "how",
+            "capabilities"
+        ]
+    }
+}

@@ -1,0 +1,79 @@
+{
+    "tool_name": "slack_bot",
+    "version": "1.0.0",
+    "description": "Slack integration for receiving messages and sending formatted responses with buttons",
+    "category": "channel",
+    "blueprint_tasks": [
+        "all"
+    ],
+    "required_params": [
+        {
+            "name": "action",
+            "type": "string",
+            "description": "Action to perform",
+            "allowed_values": [
+                "send_message",
+                "send_confirmation",
+                "parse_input"
+            ]
+        }
+    ],
+    "optional_params": [
+        {
+            "name": "channel_id",
+            "type": "string",
+            "description": "Slack channel or thread ID to send to"
+        },
+        {
+            "name": "message",
+            "type": "string",
+            "description": "Message text to send"
+        },
+        {
+            "name": "blocks",
+            "type": "array",
+            "description": "Slack Block Kit formatted message blocks"
+        },
+        {
+            "name": "buttons",
+            "type": "array",
+            "description": "Action buttons: [{text: 'Yes', value: 'confirm'}, {text: 'Cancel', value: 'cancel'}]"
+        },
+        {
+            "name": "thread_ts",
+            "type": "string",
+            "description": "Thread timestamp for replying in thread"
+        },
+        {
+            "name": "user_input",
+            "type": "string",
+            "description": "Raw user message to parse"
+        }
+    ],
+    "dependencies": [],
+    "applicable_channels": [
+        "slack"
+    ],
+    "response_format": {
+        "message_ts": "timestamp of sent message",
+        "channel_id": "where message was sent",
+        "parsed_intent": "extracted user intent (for parse_input)",
+        "parsed_entities": "extracted entities (for parse_input)"
+    },
+    "error_codes": {
+        "CHANNEL_NOT_FOUND": "Couldn't find that Slack channel.",
+        "SEND_FAILED": "Message didn't send. Please try again.",
+        "INVALID_BLOCKS": "Message formatting error. Using plain text instead.",
+        "RATE_LIMITED": "Too many messages. Please wait a moment."
+    },
+    "usage_notes": [
+        "Use Block Kit for rich formatting (images, sections, dividers)",
+        "Confirmation messages should use action buttons for Yes/Cancel",
+        "Thread replies preserve conversation context",
+        "Parse both top-level messages and thread replies",
+        "Support @mentions and slash commands if configured",
+        "Handle button interactions asynchronously",
+        "Format article lists as blocks with titles and excerpts",
+        "Show image previews when sharing hero images"
+    ]
+}

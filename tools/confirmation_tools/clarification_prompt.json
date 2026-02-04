@@ -1,0 +1,78 @@
+{
+    "tool_name": "clarification_prompt",
+    "version": "1.0.0",
+    "description": "Ask follow-up questions when user intent is unclear or information is missing",
+    "category": "confirmation",
+    "blueprint_tasks": [
+        "3.10",
+        "4.1",
+        "4.2",
+        "4.9"
+    ],
+    "required_params": [
+        {
+            "name": "clarification_type",
+            "type": "string",
+            "description": "What type of clarification is needed",
+            "allowed_values": [
+                "missing_topic",
+                "missing_article",
+                "multiple_matches",
+                "vague_request",
+                "duplicate_title",
+                "missing_details"
+            ]
+        }
+    ],
+    "optional_params": [
+        {
+            "name": "options",
+            "type": "array",
+            "description": "Specific options to present (e.g., list of matching articles)"
+        },
+        {
+            "name": "context",
+            "type": "string",
+            "description": "Additional context to include in question"
+        }
+    ],
+    "dependencies": [],
+    "applicable_channels": [
+        "slack",
+        "email",
+        "portal"
+    ],
+    "response_format": {
+        "question": "formatted clarification question",
+        "expected_response_type": "free_text|selection|yes_no"
+    },
+    "clarification_templates": {
+        "missing_topic": "What should the article be about?",
+        "missing_article": "Which article do you mean?",
+        "multiple_matches": "Which one?\n1. [Title A] - [details]\n2. [Title B] - [details]\nPlease choose by number or title.",
+        "vague_request": "I can help you with: create, update, publish, delete, or list articles. What would you like to do?",
+        "duplicate_title": "We already have an article titled '[TITLE]'. Do you want to:\n1. Create a new one with a different title\n2. Update the existing article",
+        "missing_details": "Could you provide more details about [what's needed]?"
+    },
+    "error_codes": {
+        "SEND_FAILED": "Couldn't send question. Please try again."
+    },
+    "usage_notes": [
+        "Keep questions short and specific",
+        "Provide concrete options when possible (numbered lists)",
+        "Don't ask multiple questions at once unless closely related",
+        "Frame questions positively ('What should...?' not 'You didn't say...')",
+        "Include relevant context from user's message",
+        "For multiple matches, show distinguishing info (status, date)",
+        "Limit lists to 5-10 options (if more, suggest narrowing search)",
+        "Accept various response formats: numbers, titles, free text",
+        "Follow up with related question if first answer is still unclear"
+    ],
+    "best_practices": [
+        "Ask one thing at a time when possible",
+        "Offer examples of valid responses",
+        "Don't repeat what the user already said",
+        "Focus on the missing piece of information",
+        "Make it easy to answer (yes/no, pick a number, etc.)"
+    ]
+}

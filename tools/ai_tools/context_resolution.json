@@ -1,0 +1,78 @@
+{
+    "tool_name": "context_resolution",
+    "version": "1.0.0",
+    "description": "Resolve pronouns and contextual references to specific articles using conversation history",
+    "category": "ai",
+    "blueprint_tasks": [
+        "3.4",
+        "3.5",
+        "3.6",
+        "3.7",
+        "3.9",
+        "3.13"
+    ],
+    "required_params": [
+        {
+            "name": "reference",
+            "type": "string",
+            "description": "Pronoun or reference to resolve (e.g., 'it', 'that one', 'the article')"
+        },
+        {
+            "name": "context",
+            "type": "array",
+            "description": "Recent conversation turns"
+        }
+    ],
+    "optional_params": [
+        {
+            "name": "operation_type",
+            "type": "string",
+            "description": "What operation will be performed (helps prioritize candidates)",
+            "allowed_values": [
+                "update",
+                "delete",
+                "publish",
+                "unpublish",
+                "add_image"
+            ]
+        }
+    ],
+    "dependencies": [
+        "conversation_memory"
+    ],
+    "applicable_channels": [
+        "slack",
+        "email",
+        "portal"
+    ],
+    "response_format": {
+        "resolved_article_id": "unique article ID or null if can't resolve",
+        "resolved_article_title": "article title for confirmation",
+        "confidence": "high|medium|low",
+        "candidates": "array of possible matches if confidence is low",
+        "resolution_method": "recent_creation|recent_mention|explicit_reference|numbered_list"
+    },
+    "error_codes": {
+        "CANNOT_RESOLVE": "Which article do you mean?",
+        "NO_RECENT_CONTEXT": "I'm not sure which article you're referring to. Could you specify the title?",
+        "AMBIGUOUS": "Which one? [list candidates]"
+    },
+    "usage_notes": [
+        "Check last 5-10 conversation turns for article mentions",
+        "Prioritize most recently created/mentioned articles",
+        "For 'the first one', 'the second one', look for numbered lists in recent messages",
+        "Resolve 'it' to single most recent article reference",
+        "Return multiple candidates if confidence is low",
+        "Prefer draft status articles for publish operations",
+        "Prefer published status articles for unpublish operations",
+        "Thread context (Slack) should be prioritized over channel-level context",
+        "Cross-channel resolution uses user identity matching"
+    ],
+    "resolution_priority": [
+        "1. Numbered reference from recent list ('the first one' → list item 1)",
+        "2. Most recent article created/updated in conversation",
+        "3. Article mentioned in last user message",
+        "4. Article from parent Slack thread",
+        "5. Most recent article in channel/conversation"
+    ]
+}

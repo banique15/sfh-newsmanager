@@ -1,0 +1,86 @@
+{
+    "tool_name": "article_search",
+    "version": "1.0.0",
+    "description": "Search, filter, and list articles from the database with various criteria",
+    "category": "content",
+    "blueprint_tasks": [
+        "3.3"
+    ],
+    "required_params": [],
+    "optional_params": [
+        {
+            "name": "status",
+            "type": "string",
+            "description": "Filter by article status",
+            "allowed_values": [
+                "draft",
+                "published",
+                "all"
+            ],
+            "default": "all"
+        },
+        {
+            "name": "keyword",
+            "type": "string",
+            "description": "Search term to match in title or content"
+        },
+        {
+            "name": "sort_by",
+            "type": "string",
+            "description": "Field to sort results by",
+            "allowed_values": [
+                "created_at",
+                "updated_at",
+                "published_at",
+                "title"
+            ],
+            "default": "created_at"
+        },
+        {
+            "name": "sort_order",
+            "type": "string",
+            "description": "Sort direction",
+            "allowed_values": [
+                "asc",
+                "desc"
+            ],
+            "default": "desc"
+        },
+        {
+            "name": "limit",
+            "type": "integer",
+            "description": "Maximum number of results to return",
+            "default": 20,
+            "max": 100
+        },
+        {
+            "name": "offset",
+            "type": "integer",
+            "description": "Number of results to skip (for pagination)",
+            "default": 0
+        }
+    ],
+    "dependencies": [],
+    "applicable_channels": [
+        "slack",
+        "email",
+        "portal"
+    ],
+    "response_format": {
+        "articles": "array of article objects",
+        "total_count": "total matching articles",
+        "returned_count": "number of articles in this response"
+    },
+    "error_codes": {
+        "NO_RESULTS": "There are no [criteria] right now.",
+        "INVALID_FILTER": "I couldn't understand that filter. Try 'draft', 'published', or 'all'.",
+        "DATABASE_ERROR": "I couldn't search articles right now. Please try again."
+    },
+    "usage_notes": [
+        "Default limit is 20 to avoid overwhelming responses",
+        "Keyword search checks both title and content fields",
+        "Empty keyword returns all articles matching status filter",
+        "Always sort by most recent first unless user specifies otherwise",
+        "Return full article objects including id, title, excerpt, status, dates"
+    ]
+}
