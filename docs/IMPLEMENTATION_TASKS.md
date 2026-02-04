@@ -3,25 +3,25 @@
 ## Phase 1: Foundation & Core CRUD (Week 1-2)
 
 ### Step 1.1: Project Setup (2-3 days)
-- [ ] Initialize Git repository
-- [ ] Set up project structure
-- [ ] Install dependencies
-- [ ] Configure dev environment
-- [ ] Create .env from template
+- [x] Initialize Git repository
+- [x] Set up project structure
+- [x] Install dependencies
+- [x] Configure dev environment
+- [x] Create .env from template
 
 ### Step 1.2: Database Setup (2-3 days)
-- [ ] Create Supabase project
-- [ ] Implement database schema
-- [ ] Create migrations
-- [ ] Set up indexes
-- [ ] Seed test data
+- [x] Create Supabase project
+- [x] Implement database schema
+- [x] Create migrations
+- [x] Set up indexes
+- [x] Seed test data
 
 ### Step 1.3: Core Article CRUD (3-4 days)
-- [ ] Implement create_article
-- [ ] Implement read_article
-- [ ] Implement update_article
-- [ ] Implement delete_article
-- [ ] Write unit tests
+- [x] Implement create_article
+- [x] Implement read_article
+- [x] Implement update_article
+- [x] Implement delete_article
+- [x] Write unit tests
 
 ### Step 1.4: Search & Status Tools (2-3 days)
 - [ ] Implement article_search

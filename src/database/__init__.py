@@ -1,6 +1,6 @@
 """Database package."""
 
 from src.database.client import DatabaseClient, db_client, get_db
-from src.database.models import Article, Base
+from src.database.models import News, Base
 
-__all__ = ["Article", "Base", "DatabaseClient", "db_client", "get_db"]
+__all__ = ["News", "Base", "DatabaseClient", "db_client", "get_db"]

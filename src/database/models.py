@@ -13,10 +13,10 @@ class Base(DeclarativeBase):
     pass
 
 
-class Article(Base):
-    """Article model matching the Supabase schema."""
+class News(Base):
+    """News article model matching the Supabase schema."""
 
-    __tablename__ = "articles"
+    __tablename__ = "news"
 
     # Primary key
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -58,7 +58,7 @@ class Article(Base):
     def __repr__(self) -> str:
         """String representation."""
         status = "DRAFT" if self.draft else "PUBLISHED"
-        return f"<Article(id={self.id}, title='{self.news_title}', status={status})>"
+        return f"<News(id={self.id}, title='{self.news_title}', status={status})>"
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
