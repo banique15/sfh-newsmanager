@@ -32,6 +32,21 @@ class LLMClient:
                 temperature=0.7,
             )
 
+        elif self.provider == "openrouter":
+            if not settings.openai_api_key:
+                raise ValueError("OPENAI_API_KEY not configured (OpenRouter uses OpenAI-compatible API)")
+            # OpenRouter uses OpenAI-compatible API
+            self._client = ChatOpenAI(
+                model=self.model_name,
+                api_key=settings.openai_api_key,
+                base_url="https://openrouter.ai/api/v1",
+                temperature=0.7,
+                default_headers={
+                    "HTTP-Referer": "https://github.com/singforhope/newsletter-manager",
+                    "X-Title": "Newsletter Manager",
+                },
+            )
+
         elif self.provider == "anthropic":
             if not settings.anthropic_api_key:
                 raise ValueError("ANTHROPIC_API_KEY not configured")
