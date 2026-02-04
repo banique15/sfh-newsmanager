@@ -1,0 +1,14 @@
+{
+  "id": "article_001",
+  "title": "Summer Concert Series 2026",
+  "slug": "summer-concert-series-2026",
+  "excerpt": "Join us for an unforgettable summer of music as Sing for Hope brings talented artists to communities across the city.",
+  "content": "We're thrilled to announce our Summer Concert Series 2026! This year, we're bringing live music to 15 neighborhoods across New York City.\n\nEach concert features world-class musicians performing in public spaces, making art accessible to everyone. From classical to jazz, folk to contemporary, there's something for every music lover.\n\nAll concerts are free and open to the public. Bring your friends and family!\n\n**Schedule:**\n- June 15: Central Park\n- June 22: Brooklyn Bridge Park\n- June 29: Queens Botanical Garden\n\nVisit our website for the full schedule and artist lineup.",
+  "status": "draft",
+  "hero_image_url": null,
+  "created_at": "2026-02-04T14:30:00Z",
+  "updated_at": "2026-02-04T14:30:00Z",
+  "published_at": null,
+  "author": "Newsletter Manager Bot",
+  "tags": ["concerts", "summer", "events", "music"]
+}

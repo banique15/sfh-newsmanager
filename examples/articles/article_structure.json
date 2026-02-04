@@ -1,0 +1,42 @@
+{
+    "article": {
+        "id": "string (unique identifier)",
+        "title": "string (headline, required)",
+        "slug": "string (URL-friendly version of title)",
+        "excerpt": "string (short summary, ~1-2 sentences)",
+        "content": "string (full article body, markdown supported)",
+        "status": "string (draft|published)",
+        "hero_image_url": "string|null (URL to main image)",
+        "created_at": "ISO 8601 timestamp",
+        "updated_at": "ISO 8601 timestamp",
+        "published_at": "ISO 8601 timestamp|null",
+        "author": "string (author name or 'Newsletter Manager Bot')",
+        "tags": "array of strings (categories/topics)"
+    },
+    "required_fields": [
+        "title",
+        "content",
+        "status"
+    ],
+    "optional_fields": [
+        "excerpt",
+        "hero_image_url",
+        "tags"
+    ],
+    "auto_generated": [
+        "id",
+        "slug",
+        "created_at",
+        "updated_at"
+    ],
+    "status_values": {
+        "draft": "Article is saved but not visible on website",
+        "published": "Article is live and visible on website"
+    },
+    "notes": [
+        "If excerpt is not provided, generate from first 1-2 sentences of content",
+        "Slug is auto-generated from title if not provided",
+        "published_at is set when status changes from draft to published",
+        "hero_image_url can link to images stored in media system"
+    ]
+}

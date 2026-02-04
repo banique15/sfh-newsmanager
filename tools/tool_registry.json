@@ -1,0 +1,104 @@
+{
+    "registry_version": "1.0.0",
+    "last_updated": "2026-02-04",
+    "tools": [
+        {
+            "tool_name": "slack_bot",
+            "category": "channel",
+            "description": "Slack integration for receiving and responding to user messages",
+            "location": "channel_tools/slack_bot.json"
+        },
+        {
+            "tool_name": "email_handler",
+            "category": "channel",
+            "description": "Email parsing and sending for email-based interactions",
+            "location": "channel_tools/email_handler.json"
+        },
+        {
+            "tool_name": "article_crud",
+            "category": "content",
+            "description": "Create, read, update, delete operations for articles",
+            "location": "content_tools/article_crud.json"
+        },
+        {
+            "tool_name": "article_search",
+            "category": "content",
+            "description": "List, filter, and search article database",
+            "location": "content_tools/article_search.json"
+        },
+        {
+            "tool_name": "article_status",
+            "category": "content",
+            "description": "Publish and unpublish article operations",
+            "location": "content_tools/article_status.json"
+        },
+        {
+            "tool_name": "content_generation",
+            "category": "ai",
+            "description": "Generate article content (title, body, excerpt)",
+            "location": "ai_tools/content_generation.json"
+        },
+        {
+            "tool_name": "image_generation",
+            "category": "ai",
+            "description": "Generate hero images and other visual assets",
+            "location": "ai_tools/image_generation.json"
+        },
+        {
+            "tool_name": "intent_detection",
+            "category": "ai",
+            "description": "Parse and understand user requests",
+            "location": "ai_tools/intent_detection.json"
+        },
+        {
+            "tool_name": "context_resolution",
+            "category": "ai",
+            "description": "Resolve references like 'it', 'that article'",
+            "location": "ai_tools/context_resolution.json"
+        },
+        {
+            "tool_name": "image_storage",
+            "category": "media",
+            "description": "Upload and store images, get permanent URLs",
+            "location": "media_tools/image_storage.json"
+        },
+        {
+            "tool_name": "image_linking",
+            "category": "media",
+            "description": "Link images to articles as hero images",
+            "location": "media_tools/image_linking.json"
+        },
+        {
+            "tool_name": "yes_no_prompt",
+            "category": "confirmation",
+            "description": "Generate Yes/Cancel confirmation prompts",
+            "location": "confirmation_tools/yes_no_prompt.json"
+        },
+        {
+            "tool_name": "clarification_prompt",
+            "category": "confirmation",
+            "description": "Ask follow-up questions for clarification",
+            "location": "confirmation_tools/clarification_prompt.json"
+        },
+        {
+            "tool_name": "conversation_memory",
+            "category": "utility",
+            "description": "Track context across conversation turns",
+            "location": "utility_tools/conversation_memory.json"
+        },
+        {
+            "tool_name": "error_handler",
+            "category": "utility",
+            "description": "Format error messages in plain language",
+            "location": "utility_tools/error_handler.json"
+        }
+    ],
+    "categories": {
+        "channel": "Communication interfaces (Slack, Email, Portal)",
+        "content": "Article database operations",
+        "ai": "LLM-powered capabilities",
+        "media": "Image and asset management",
+        "confirmation": "User interaction and approval",
+        "utility": "Supporting functions"
+    }
+}

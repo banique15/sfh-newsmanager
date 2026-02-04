@@ -1,0 +1,93 @@
+{
+    "tool_name": "article_crud",
+    "version": "1.0.0",
+    "description": "Core database operations for creating, reading, updating, and deleting articles in the news database",
+    "category": "content",
+    "blueprint_tasks": [
+        "3.1",
+        "3.2",
+        "3.4",
+        "3.5"
+    ],
+    "required_params": [
+        {
+            "name": "operation",
+            "type": "string",
+            "description": "Operation to perform: create|read|update|delete",
+            "allowed_values": [
+                "create",
+                "read",
+                "update",
+                "delete"
+            ]
+        },
+        {
+            "name": "article_id",
+            "type": "string",
+            "description": "Unique article identifier (required for read, update, delete)",
+            "required_for": [
+                "read",
+                "update",
+                "delete"
+            ]
+        }
+    ],
+    "optional_params": [
+        {
+            "name": "title",
+            "type": "string",
+            "description": "Article headline"
+        },
+        {
+            "name": "content",
+            "type": "string",
+            "description": "Article body content (markdown supported)"
+        },
+        {
+            "name": "excerpt",
+            "type": "string",
+            "description": "Short summary (auto-generated if not provided)"
+        },
+        {
+            "name": "status",
+            "type": "string",
+            "description": "Article status: draft|published (defaults to draft)",
+            "allowed_values": [
+                "draft",
+                "published"
+            ]
+        },
+        {
+            "name": "hero_image_url",
+            "type": "string",
+            "description": "URL to hero image (optional)"
+        },
+        {
+            "name": "tags",
+            "type": "array",
+            "description": "Array of tag strings for categorization"
+        }
+    ],
+    "dependencies": [
+        "conversation_memory"
+    ],
+    "applicable_channels": [
+        "slack",
+        "email",
+        "portal"
+    ],
+    "examples": "../../examples/articles/article_structure.json",
+    "error_codes": {
+        "ARTICLE_NOT_FOUND": "I couldn't find that article. Could you specify the title or describe which article you mean?",
+        "DUPLICATE_TITLE": "An article with a similar title already exists. Would you like to create it with a different title, or update the existing one?",
+        "MISSING_REQUIRED_FIELD": "I need more information to create the article. What should the article be about?",
+        "DATABASE_ERROR": "Something went wrong while saving the article. Please try again, or let me know if you need help."
+    },
+    "usage_notes": [
+        "Always default new articles to 'draft' status unless user explicitly requests 'published'",
+        "Auto-generate slug from title if not provided",
+        "Auto-generate excerpt from first 1-2 sentences if not provided",
+        "Return full article object after create/update operations",
+        "For update operations, only modify fields provided in params (partial updates)"
+    ]
+}
