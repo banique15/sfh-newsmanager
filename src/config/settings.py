@@ -1,6 +1,11 @@
 """Application settings loaded from environment variables."""
 
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+# Load environment variables into os.environ for libraries that read them directly (e.g. litellm)
+load_dotenv()
 
 
 class Settings(BaseSettings):

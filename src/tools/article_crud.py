@@ -1,12 +1,17 @@
 """Article CRUD operations tool for CrewAI."""
 
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any
 
 from crewai.tools import tool
-from sqlalchemy.orm import Session
+from supabase import create_client
 
-from src.database import News, get_db
+from src.config.settings import settings
+
+
+def get_supabase():
+    """Get Supabase client."""
+    return create_client(settings.supabase_url, settings.supabase_key)
 
 
 @tool("Create Article")
@@ -34,40 +39,40 @@ def create_article(
     Returns:
         Dictionary with article data including ID
     """
-    session: Session = next(get_db())
-    
     try:
-        # Create article instance
-        article = News(
-            news_title=news_title,
-            newscontent=newscontent,
-            news_excerpt=news_excerpt,
-            news_image=news_image,
-            news_image_caption=news_image_caption,
-            news_author=news_author,
-            news_date=datetime.utcnow(),
-            draft=draft,
-        )
+        supabase = get_supabase()
         
-        session.add(article)
-        session.commit()
-        session.refresh(article)
+        data = {
+            "news_title": news_title,
+            "newscontent": newscontent,
+            "news_excerpt": news_excerpt,
+            "news_image": news_image,
+            "news_image_caption": news_image_caption,
+            "news_author": news_author,
+            "news_date": datetime.utcnow().isoformat(),
+            "draft": draft,
+            "created_at": datetime.utcnow().isoformat(),
+        }
+        
+        result = supabase.table("news").insert(data).execute()
+        
+        if not result.data:
+            raise Exception("No data returned from insert")
+            
+        article = result.data[0]
         
         return {
             "success": True,
-            "article": article.to_dict(),
-            "message": f"Created article '{article.news_title}' (ID: {article.id})",
+            "article": article,
+            "message": f"Created article '{article['news_title']}' (ID: {article['id']})",
         }
         
     except Exception as e:
-        session.rollback()
         return {
             "success": False,
             "error": str(e),
             "message": f"Failed to create article: {str(e)}",
         }
-    finally:
-        session.close()
 
 
 @tool("Read Article")
@@ -88,17 +93,18 @@ def read_article(article_id: int | None = None, news_url: str | None = None) -> 
             "error": "Must provide either article_id or news_url",
         }
     
-    session: Session = next(get_db())
-    
     try:
-        query = session.query(News)
+        supabase = get_supabase()
+        query = supabase.table("news").select("*")
         
         if article_id:
-            article = query.filter(News.id == article_id).first()
+            query = query.eq("id", article_id)
         else:
-            article = query.filter(News.news_url == news_url).first()
+            query = query.eq("news_url", news_url)
+            
+        result = query.execute()
         
-        if not article:
+        if not result.data:
             return {
                 "success": False,
                 "error": "Article not found",
@@ -107,7 +113,7 @@ def read_article(article_id: int | None = None, news_url: str | None = None) -> 
         
         return {
             "success": True,
-            "article": article.to_dict(),
+            "article": result.data[0],
         }
         
     except Exception as e:
@@ -116,8 +122,6 @@ def read_article(article_id: int | None = None, news_url: str | None = None) -> 
             "error": str(e),
             "message": f"Failed to read article: {str(e)}",
         }
-    finally:
-        session.close()
 
 
 @tool("Update Article")
@@ -143,49 +147,55 @@ def update_article(
     Returns:
         Dictionary with updated article data
     """
-    session: Session = next(get_db())
-    
     try:
-        article = session.query(News).filter(News.id == article_id).first()
+        supabase = get_supabase()
         
-        if not article:
+        # Prepare update data
+        data = {}
+        if news_title is not None:
+            data["news_title"] = news_title
+        if newscontent is not None:
+            data["newscontent"] = newscontent
+        if news_excerpt is not None:
+            data["news_excerpt"] = news_excerpt
+        if news_image is not None:
+            data["news_image"] = news_image
+        if news_image_caption is not None:
+            data["news_image_caption"] = news_image_caption
+            
+        if not data:
+            return {
+                "success": False,
+                "error": "No fields to update",
+                "message": "No fields provided to update",
+            }
+
+        # Automatically update news_updated timestamp
+        data["news_updated"] = datetime.utcnow().isoformat()
+        
+        result = supabase.table("news").update(data).eq("id", article_id).execute()
+        
+        if not result.data:
             return {
                 "success": False,
                 "error": "Article not found",
                 "message": f"No article found with ID: {article_id}",
             }
-        
-        # Update fields if provided
-        if news_title is not None:
-            article.news_title = news_title
-        if newscontent is not None:
-            article.newscontent = newscontent
-        if news_excerpt is not None:
-            article.news_excerpt = news_excerpt
-        if news_image is not None:
-            article.news_image = news_image
-        if news_image_caption is not None:
-            article.news_image_caption = news_image_caption
-        
-        # news_updated is auto-set by trigger
-        session.commit()
-        session.refresh(article)
+            
+        article = result.data[0]
         
         return {
             "success": True,
-            "article": article.to_dict(),
-            "message": f"Updated article '{article.news_title}' (ID: {article.id})",
+            "article": article,
+            "message": f"Updated article '{article['news_title']}' (ID: {article['id']})",
         }
         
     except Exception as e:
-        session.rollback()
         return {
             "success": False,
             "error": str(e),
             "message": f"Failed to update article: {str(e)}",
         }
-    finally:
-        session.close()
 
 
 @tool("Delete Article")
@@ -199,21 +209,22 @@ def delete_article(article_id: int) -> dict[str, Any]:
     Returns:
         Dictionary with deletion confirmation
     """
-    session: Session = next(get_db())
-    
     try:
-        article = session.query(News).filter(News.id == article_id).first()
+        supabase = get_supabase()
         
-        if not article:
+        # Check if exists first to get title
+        check = supabase.table("news").select("news_title").eq("id", article_id).execute()
+        if not check.data:
             return {
                 "success": False,
                 "error": "Article not found",
                 "message": f"No article found with ID: {article_id}",
             }
+            
+        title = check.data[0]["news_title"]
         
-        title = article.news_title
-        session.delete(article)
-        session.commit()
+        # Delete
+        supabase.table("news").delete().eq("id", article_id).execute()
         
         return {
             "success": True,
@@ -221,14 +232,11 @@ def delete_article(article_id: int) -> dict[str, Any]:
         }
         
     except Exception as e:
-        session.rollback()
         return {
             "success": False,
             "error": str(e),
             "message": f"Failed to delete article: {str(e)}",
         }
-    finally:
-        session.close()
 
 
 @tool("Publish Article")
@@ -242,44 +250,42 @@ def publish_article(article_id: int) -> dict[str, Any]:
     Returns:
         Dictionary with published article data
     """
-    session: Session = next(get_db())
-    
     try:
-        article = session.query(News).filter(News.id == article_id).first()
+        supabase = get_supabase()
         
-        if not article:
+        # Check current status
+        check = supabase.table("news").select("draft, news_title").eq("id", article_id).execute()
+        if not check.data:
             return {
                 "success": False,
                 "error": "Article not found",
                 "message": f"No article found with ID: {article_id}",
             }
-        
-        if not article.draft:
+            
+        article = check.data[0]
+        if not article["draft"]:
             return {
                 "success": False,
                 "error": "Already published",
-                "message": f"Article '{article.news_title}' is already published",
+                "message": f"Article '{article['news_title']}' is already published",
             }
-        
-        article.draft = False
-        session.commit()
-        session.refresh(article)
+            
+        # Update
+        result = supabase.table("news").update({"draft": False}).eq("id", article_id).execute()
+        updated_article = result.data[0]
         
         return {
             "success": True,
-            "article": article.to_dict(),
-            "message": f"Published article '{article.news_title}' (ID: {article.id})",
+            "article": updated_article,
+            "message": f"Published article '{updated_article['news_title']}' (ID: {article_id})",
         }
         
     except Exception as e:
-        session.rollback()
         return {
             "success": False,
             "error": str(e),
             "message": f"Failed to publish article: {str(e)}",
         }
-    finally:
-        session.close()
 
 
 @tool("Unpublish Article")
@@ -293,44 +299,42 @@ def unpublish_article(article_id: int) -> dict[str, Any]:
     Returns:
         Dictionary with unpublished article data
     """
-    session: Session = next(get_db())
-    
     try:
-        article = session.query(News).filter(News.id == article_id).first()
+        supabase = get_supabase()
         
-        if not article:
+        # Check current status
+        check = supabase.table("news").select("draft, news_title").eq("id", article_id).execute()
+        if not check.data:
             return {
                 "success": False,
                 "error": "Article not found",
                 "message": f"No article found with ID: {article_id}",
             }
-        
-        if article.draft:
+            
+        article = check.data[0]
+        if article["draft"]:
             return {
                 "success": False,
                 "error": "Already draft",
-                "message": f"Article '{article.news_title}' is already a draft",
+                "message": f"Article '{article['news_title']}' is already a draft",
             }
-        
-        article.draft = True
-        session.commit()
-        session.refresh(article)
+            
+        # Update
+        result = supabase.table("news").update({"draft": True}).eq("id", article_id).execute()
+        updated_article = result.data[0]
         
         return {
             "success": True,
-            "article": article.to_dict(),
-            "message": f"Unpublished article '{article.news_title}' (ID: {article.id})",
+            "article": updated_article,
+            "message": f"Unpublished article '{updated_article['news_title']}' (ID: {article_id})",
         }
         
     except Exception as e:
-        session.rollback()
         return {
             "success": False,
             "error": str(e),
             "message": f"Failed to unpublish article: {str(e)}",
         }
-    finally:
-        session.close()
 
 
 # Export all tools

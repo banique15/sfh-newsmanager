@@ -3,10 +3,14 @@
 from typing import Any, Literal
 
 from crewai.tools import tool
-from sqlalchemy import or_
-from sqlalchemy.orm import Session
+from supabase import create_client
 
-from src.database import News, get_db
+from src.config.settings import settings
+
+
+def get_supabase():
+    """Get Supabase client."""
+    return create_client(settings.supabase_url, settings.supabase_key)
 
 
 @tool("Search Articles")
@@ -28,41 +32,42 @@ def search_articles(
     Returns:
         Dictionary with articles list and count
     """
-    session: Session = next(get_db())
-    
     try:
-        # Build query
-        query = session.query(News)
+        supabase = get_supabase()
+        
+        # Start query
+        query = supabase.table("news").select("*", count="exact")
         
         # Filter by status
         if status == "draft":
-            query = query.filter(News.draft == True)
+            query = query.eq("draft", True)
         elif status == "published":
-            query = query.filter(News.draft == False)
+            query = query.eq("draft", False)
         
         # Search by keyword
         if keyword:
-            search_pattern = f"%{keyword}%"
-            query = query.filter(
-                or_(
-                    News.news_title.ilike(search_pattern),
-                    News.newscontent.ilike(search_pattern),
-                    News.news_excerpt.ilike(search_pattern),
-                )
-            )
+            # Using ilike for case-insensitive search
+            # Note: logical OR in PostgREST is done via .or_() filter or raw string
+            # We'll use a simpler approach: direct filter if keyword provided
+            # For complex OR search (title OR content), we use the .or_ syntax:
+            # filter.or_(f"news_title.ilike.%{keyword}%,newscontent.ilike.%{keyword}%")
+            search_filter = f"news_title.ilike.%{keyword}%,newscontent.ilike.%{keyword}%"
+            query = query.or_(search_filter)
         
-        # Get total count
-        total_count = query.count()
+        # Ordering
+        query = query.order("created_at", desc=True)
         
-        # Apply limit and offset
-        limit = min(limit, 100)  # Cap at 100
-        articles = query.order_by(News.created_at.desc()).limit(limit).offset(offset).all()
+        # Limits
+        limit = min(limit, 100)
+        query = query.range(offset, offset + limit - 1)
+        
+        result = query.execute()
         
         return {
             "success": True,
-            "articles": [article.to_dict() for article in articles],
-            "count": len(articles),
-            "total": total_count,
+            "articles": result.data,
+            "count": len(result.data),
+            "total": result.count,
             "limit": limit,
             "offset": offset,
         }
@@ -73,8 +78,6 @@ def search_articles(
             "error": str(e),
             "message": f"Failed to search articles: {str(e)}",
         }
-    finally:
-        session.close()
 
 
 @tool("List Articles")
@@ -92,7 +95,8 @@ def list_articles(
     Returns:
         Dictionary with articles list
     """
-    return search_articles(keyword=None, status=status, limit=limit, offset=0)
+    # Call the run method of the tool since it's decorated
+    return search_articles.run(keyword=None, status=status, limit=limit, offset=0)
 
 
 __all__ = ["search_articles", "list_articles"]
