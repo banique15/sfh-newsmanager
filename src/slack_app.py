@@ -13,6 +13,7 @@ from slack_sdk.errors import SlackApiError
 
 from src.agents import newsletter_agent
 from src.config.settings import settings
+from src.agents.memory import memory
 from crewai import Task
 
 # Configure logging
@@ -42,6 +43,12 @@ def handle_app_mention(event, say):
 
     logger.info(f"Received mention in {channel_id}: {text}")
     
+    # 1. Add User Message to History
+    memory.add_message(thread_ts, "user", text)
+    
+    # 2. Get Context
+    history_context = memory.get_formatted_history(thread_ts)
+    
     # Notify user we are working on it
     # reaction = app.client.reactions_add(name="thinking_face", channel=channel_id, timestamp=event["ts"])
     say(f"👋 Hi <@{user_id}>, I'm looking into that...", thread_ts=thread_ts)
@@ -49,18 +56,30 @@ def handle_app_mention(event, say):
     # Run Agent
     try:
         task = Task(
-            description=f"User request from Slack channel {channel_id}: {text}. If you generate content or images, present them. If you need to perform actions (create, draft), DO IT. Use the slack_tool to reply if you want to be fancy, otherwise I will send your final answer as a reply.",
-            expected_output="A helpful response to the user's request",
+            description=f"""User request from Slack channel {channel_id}: {text}
+            
+            {history_context}
+            
+            DIRECTIVE:
+            You are an autonomous agent. When asked to generate content, you MUST call the tool 'Generate Content'.
+            IDLE CHIT-CHAT IS FORBIDDEN for this task.
+            
+            You must return the ACTUAL GENERATED CONTENT from the tool call as your Final Answer.
+            Do not say "I have generated it". Show it.
+            """,
+            expected_output="The full text of the article or the image URL.",
             agent=newsletter_agent
         )
         
         result = newsletter_agent.execute_task(task)
         
-        # Send result back to Slack
-        # If the result looks like a simple string, just send it.
-        # If the agent used the slack_tool to send a response already, we might interpret that.
-        # But usually CrewAI returns a final string string.
+        # Log result for debugging
+        logger.info(f"Agent Result for {user_id}: {str(result)[:100]}...")
         
+        # 3. Add Agent Response to History
+        memory.add_message(thread_ts, "assistant", str(result))
+        
+        # Send result back to Slack
         say(str(result), thread_ts=thread_ts)
         
     except Exception as e:
