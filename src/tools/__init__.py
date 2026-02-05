@@ -9,6 +9,8 @@ from src.tools.article_crud import (
     update_article,
 )
 from src.tools.article_search import list_articles, search_articles
+from src.tools.content import generate_content
+from src.tools.intent import ask_clarification
 
 # All available tools
 ALL_TOOLS = [
@@ -20,6 +22,8 @@ ALL_TOOLS = [
     unpublish_article,
     search_articles,
     list_articles,
+    ask_clarification,
+    generate_content,
 ]
 
 __all__ = [
@@ -31,5 +35,7 @@ __all__ = [
     "unpublish_article",
     "search_articles",
     "list_articles",
+    "ask_clarification",
+    "generate_content",
     "ALL_TOOLS",
 ]
