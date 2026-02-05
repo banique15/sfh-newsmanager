@@ -12,6 +12,7 @@ from src.tools.article_search import list_articles, search_articles
 from src.tools.content import generate_content
 from src.tools.image import generate_image
 from src.tools.intent import ask_clarification
+from src.tools.slack import slack_tool
 
 # All available tools
 ALL_TOOLS = [
@@ -26,6 +27,7 @@ ALL_TOOLS = [
     ask_clarification,
     generate_content,
     generate_image,
+    slack_tool,
 ]
 
 __all__ = [
@@ -40,5 +42,6 @@ __all__ = [
     "ask_clarification",
     "generate_content",
     "generate_image",
+    "slack_tool",
     "ALL_TOOLS",
 ]
