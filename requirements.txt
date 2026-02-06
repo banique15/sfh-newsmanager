@@ -10,6 +10,7 @@ langchain-google-genai==2.0.8
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
 python-multipart==0.0.20
+markdown==3.7
 
 # Database & Storage
 supabase==2.11.0
