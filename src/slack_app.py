@@ -17,6 +17,7 @@ from src.agents.content_generator import content_generator_agent
 from src.config.settings import settings
 from src.agents.memory import memory
 from src.agents.state import state_manager
+from src.utils.temp_file_manager import temp_file_manager
 from crewai import Task
 
 # Configure logging
@@ -87,6 +88,11 @@ def handle_approve(ack, body, say):
             # Clear state
             state_manager.clear_pending_action(thread_ts)
             
+            # Cleanup temp files after successful execution
+            cleaned = temp_file_manager.cleanup_all()
+            if cleaned > 0:
+                logger.info(f"🧹 Cleaned up {cleaned} temp file(s) after approval")
+            
              # Update memory with the result so conversation flow continues
             memory.add_message(thread_ts, "system", f"Action {tool_name} executed successfully. Result: {result}")
             
@@ -105,6 +111,12 @@ def handle_deny(ack, body, say):
     thread_ts = body["container"]["message_ts"]
     
     state_manager.clear_pending_action(thread_ts)
+    
+    # Cleanup temp files after denial
+    cleaned = temp_file_manager.cleanup_all()
+    if cleaned > 0:
+        logger.info(f"🧹 Cleaned up {cleaned} temp file(s) after denial")
+    
     say(f"🚫 Request denied by <@{user_id}>. Action cancelled.", thread_ts=thread_ts)
     memory.add_message(thread_ts, "system", f"User <@{user_id}> denied the action.")
 
@@ -123,40 +135,137 @@ def start_dashboard():
     except Exception as e:
         logger.error(f"Failed to start dashboard: {e}")
 
-def process_files(files):
-    """Download and extract text from Slack files."""
+def process_files(files, channel_id=None, thread_ts=None):
+    """Download and extract text from Slack files with progress indicators.
+    
+    Args:
+        files: List of Slack file objects
+        channel_id: Optional Slack channel ID for progress reactions
+        thread_ts: Optional thread timestamp for progress reactions
+        
+    Returns:
+        Extracted text content from all files
+    """
     content = ""
     headers = {"Authorization": f"Bearer {settings.slack_bot_token}"}
     
-    for file in files:
+    import io
+    from pypdf import PdfReader
+    import docx
+    
+    for idx, file in enumerate(files, 1):
         file_type = file.get("filetype")
         url = file.get("url_private")
         name = file.get("name")
+        file_size = file.get("size", 0)
         
         if not url:
             continue
-            
-        logger.info(f"Processing file: {name} ({file_type})")
+        
+        # Add progress indicator for files
+        file_size_kb = file_size / 1024 if file_size else 0
+        logger.info(f"📥 Processing file {idx}/{len(files)}: {name} ({file_type}, {file_size_kb:.1f}KB)")
+        
+        # Add file size validation
+        if file_size > 10 * 1024 * 1024:  # 10MB limit
+            logger.warning(f"⚠️ File {name} exceeds 10MB, skipping")
+            content += f"\n\n[FILE SKIPPED: {name} - File too large (max 10MB)]\n"
+            continue
         
         try:
+            # Add reaction to show we're processing
+            if channel_id and thread_ts:
+                try:
+                    app.client.reactions_add(
+                        channel=channel_id,
+                        timestamp=thread_ts,
+                        name="hourglass_flowing_sand"
+                    )
+                except:
+                    pass  # Ignore reaction errors
+            
             # We use httpx to download the file content
-            with httpx.Client() as client:
+            with httpx.Client(timeout=30.0) as client:
                 response = client.get(url, headers=headers, follow_redirects=True)
                 
             if response.status_code == 200:
-                file_text = response.text
-                # Simple text extraction. For PDF, we might need PyPDF (not installed).
-                # Supporting text types for now.
+                file_bytes = io.BytesIO(response.content)
+                file_text = ""
+                
+                # 1. Handle Text-based files
                 if file_type in ["text", "markdown", "javascript", "python", "json", "csv"]:
-                    content += f"\n\n--- FILE: {name} ---\n{file_text}\n--- END FILE ---\n"
+                    file_text = response.text
+                    logger.info(f"✅ Extracted text from {name}")
+                
+                # 2. Handle PDF
                 elif file_type == "pdf":
-                    # Placeholder for PDF
-                    content += f"\n\n[Attached PDF: {name} - (PDF parsing requires extra libraries, showing metadata only)]\n"
+                    try:
+                        reader = PdfReader(file_bytes)
+                        for page in reader.pages:
+                            file_text += page.extract_text() + "\n"
+                        logger.info(f"✅ Extracted {len(file_text)} chars from PDF {name}")
+                    except Exception as e:
+                        logger.error(f"❌ Failed to parse PDF {name}: {e}")
+                        file_text = f"[Error parsing PDF content: {str(e)}]"
+                
+                # 3. Handle DOCX
+                elif file_type in ["docx", "doc"]:
+                    try:
+                        doc = docx.Document(file_bytes)
+                        for para in doc.paragraphs:
+                            file_text += para.text + "\n"
+                        logger.info(f"✅ Extracted {len(file_text)} chars from DOCX {name}")
+                    except Exception as e:
+                        logger.error(f"❌ Failed to parse DOCX {name}: {e}")
+                        file_text = f"[Error parsing DOCX content: {str(e)}]"
+                
+                # 4. Handle Images - Use temp file manager
+                elif file_type in ["jpg", "jpeg", "png"]:
+                    # Use temp file manager for automatic cleanup
+                    filepath = temp_file_manager.write_temp_file(
+                        content=file_bytes.getvalue(),
+                        suffix=f".{file_type}",
+                        prefix=f"slack_image_{idx}_"
+                    )
+                    
+                    file_text = f"[IMAGE RECEIVED: {name} - Saved to {filepath}]\n(Agent: Use the 'Analyze Image' tool with this path if you need to see it.)"
+                    logger.info(f"✅ Saved image {name} to temp file (tracked for cleanup)")
+                
                 else:
-                    content += f"\n\n[Attached File: {name} ({file_type}) - Content skipped]\n"
+                    file_text = f"[Attached File: {name} ({file_type}) - Format not supported for text extraction]"
+                    logger.info(f"ℹ️ Unsupported file type: {file_type}")
+
+                # Append to content if we got anything
+                if file_text:
+                    content += f"\n\n--- FILE: {name} ---\n{file_text[:50000]} \n--- END FILE ---\n"
+                    if len(file_text) > 50000:
+                        content += "\n⚠️ (File truncated at 50k chars)\n"
+                        logger.warning(f"⚠️ File {name} truncated (original: {len(file_text)} chars)")
+            else:
+                logger.error(f"❌ Failed to download {name}: HTTP {response.status_code}")
+                content += f"\n\n[ERROR: Failed to download {name}]\n"
+
         except Exception as e:
-            logger.error(f"Error downloading file {name}: {e}")
-            
+            logger.error(f"❌ Error processing file {name}: {e}")
+            content += f"\n\n[ERROR processing {name}: {str(e)}]\n"
+    
+    # Update reaction to show completion
+    if channel_id and thread_ts:
+        try:
+            app.client.reactions_remove(
+                channel=channel_id,
+                timestamp=thread_ts,
+                name="hourglass_flowing_sand"
+            )
+            app.client.reactions_add(
+                channel=channel_id,
+                timestamp=thread_ts,
+                name="white_check_mark"
+            )
+        except:
+            pass  # Ignore reaction errors
+    
+    logger.info(f"📋 Processed {len(files)} file(s), extracted {len(content)} chars total")
     return content
 
 @app.event("app_mention")
@@ -227,7 +336,7 @@ def handle_app_mention(event, say):
     if files:
         logger.info(f"=== FILE DEBUG === Processing {len(files)} file(s)")
         say(f"📂 I found {len(files)} file(s). Reading them...", thread_ts=thread_ts)
-        file_context = process_files(files)
+        file_context = process_files(files, channel_id=channel_id, thread_ts=thread_ts)
         logger.info(f"=== FILE DEBUG === File context length: {len(file_context)} chars")
         logger.info(f"=== FILE DEBUG === File context preview: {file_context[:200]}...")
     else:

@@ -16,6 +16,8 @@ from src.tools.slack import slack_tool
 
 from src.tools.confirmation import ask_confirmation
 
+from src.tools.vision import analyze_image
+
 # All available tools
 ALL_TOOLS = [
     create_article,
@@ -29,6 +31,7 @@ ALL_TOOLS = [
     ask_clarification,
     generate_content,
     generate_image,
+    analyze_image,
     ask_confirmation,
     slack_tool,
 ]

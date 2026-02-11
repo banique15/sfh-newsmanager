@@ -2,7 +2,6 @@ from typing import Any, Dict, Optional
 import json
 from crewai.tools import tool
 from src.tools.slack import get_slack_client
-from src.agents.state import state_manager
 
 @tool("Ask Confirmation")
 def ask_confirmation(
